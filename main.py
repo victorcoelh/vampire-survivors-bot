@@ -11,9 +11,11 @@ def draw_debug_boxes(frame, drawer: AnnotationDrawer,
                      detections: List[Detection], class_names: List[str]):   
     for detection in detections:
         x1, y1, x2, y2 = detection.position
-        debug_info = f"{class_names[detection.label]}: {detection.confidence:.2f}"
+        label = class_names[detection.label]
+        debug_info = f"{label}: {detection.confidence:.2f}"
+        color = (0, 0, 255) if label == "monster" else (255, 0, 0) # BGR
         
-        drawer.draw_rectangle(frame, (x1, y1), (x2, y2))
+        drawer.draw_rectangle(frame, color, (x1, y1), (x2, y2))
         drawer.draw_text_with_background(frame, debug_info, (x1, y1))
 
 
@@ -27,7 +29,7 @@ def get_frame_from_game(bounding_box: Tuple[int, int, int, int]):
 def main():
     torch.cuda.set_device(0) # Allows PyTorch to use a CUDA GPU for inference.
     drawer = AnnotationDrawer()
-    inference_model = ObjectDetector()
+    inference_model = ObjectDetector("model/monster_class.pt")
     game_area = {"top": 0, "left": 0, "width": 1245, "height": 768}
     
     while cv2.waitKey(1) != 27:    
