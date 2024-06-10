@@ -29,4 +29,7 @@ class AnnotationDrawer:
         cv2.putText(frame, text, point, self.font, self.font_scale, self.font_color)
         
         return frame
+    
+    def draw_performance_stats():
+        pass
         
