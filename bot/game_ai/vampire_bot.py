@@ -1,11 +1,8 @@
 from typing import List, Dict
 from random import sample
-import cv2.text
-import cv2
 import numpy as np
 
-from bot.computer_vision.object_detection import Detection, ObjectDetector
-from bot.game_ai.graph import MovementGraph
+from bot.computer_vision.object_detection import Detection
 from bot.utilities import Point, distance_to_point
 
 
@@ -24,7 +21,7 @@ class PositionEvaluator():
         self.monsters = sample(monsters, int(sampling_rate * len(monsters)))
         self.runes = sample(runes, int(sampling_rate * len(runes)))
         
-    def value(self, position: Point):
+    def value(self, position: Point) -> float:
         value = 0.5 # base value
         value += self.__gain(position) - self.__risk(position)
         return np.clip(value, 0, 1)

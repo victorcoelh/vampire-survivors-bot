@@ -13,6 +13,16 @@ def distance_to_point(point_a: Point, point_b: Point) -> float:
     return math.sqrt((x*x) + (y*y))
 
 
+def middle_point(point_a: Point, point_b: Point) -> Point:
+    x = (point_a[0] + point_b[0]) / 2
+    y = (point_a[1] + point_b[1]) / 2
+    return (x, y)
+
+
+def point_convert_to_int(point: Point) -> Point:
+    return int(point[0]), int(point[1])
+
+
 def boxes_intersect(rect_a: Rect, rect_b: Rect) -> bool:
     xa1, ya1, xa2, ya2 = rect_a
     xb1, yb1, xb2, yb2 = rect_b

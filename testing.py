@@ -15,6 +15,8 @@ def main():
     
     G = MovementGraph((960, 540), evaluator)
     G.draw_to_frame(frame)
+    G.draw_network_x(evaluator)
+    print(G.find_highest_value_path())
     
     cv2.imshow("Image", frame)
     cv2.waitKey()
