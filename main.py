@@ -3,9 +3,9 @@ import torch
 import pyautogui
 from typing import List, Tuple
 
-from annotations import AnnotationDrawer
-from object_detection import ObjectDetector, Detection
-from screenshot import screenshot
+from bot.computer_vision.annotations import AnnotationDrawer
+from bot.computer_vision.object_detection import ObjectDetector, Detection
+from bot.computer_vision.screenshot import screenshot
 
 
 KEY_ESC = 27
@@ -32,7 +32,6 @@ def get_frame_from_game(bounding_box: Tuple[int, int, int, int]):
 
 
 def check_and_update_box_position(key_press, game_area):
-    print(key_press)
     if key_press == KEY_Q:
         x, y = pyautogui.position()
         game_area["top"] = y
@@ -43,7 +42,9 @@ def main():
     torch.cuda.set_device(0) # Allows PyTorch to use a CUDA GPU for inference.
     drawer = AnnotationDrawer()
     inference_model = ObjectDetector("model/monster_class.pt")
-    game_area = {"top": 0, "left": 0, "width": 1245, "height": 768}
+    
+    game_dimensions = (1245, 768)
+    game_area = {"top": 0, "left": 0, "width": game_dimensions[0], "height": game_dimensions[1]}
     
     while (key_press := cv2.waitKey(1)) != KEY_ESC:    
         frame = get_frame_from_game(game_area)
