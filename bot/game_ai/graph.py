@@ -3,11 +3,11 @@ import cv2
 import numpy as np
 import math
 from matplotlib import pyplot as plt
-from typing import Dict
+from typing import Dict, Tuple, List
 
 from bot.utilities import Point, middle_point, point_convert_to_int
 from bot.computer_vision.annotations import AnnotationDrawer
-from bot.game_ai.vampire_bot import PositionEvaluator
+from bot.game_ai.position_evaluator import PositionEvaluator
 
 
 class MovementGraph():
@@ -50,6 +50,17 @@ class MovementGraph():
             
         return G
     
+    def calculate_best_path(self, turns: int = 5) -> List[Tuple[Point, Point]]:
+        current_node = self.get_middle_node()
+        path = []
+        
+        for _ in range(turns):
+            out_edges = list(self.G.edges(current_node, data=True))
+            best_edge = max(out_edges, key= lambda x: x[2]["weight"])
+            path.append(best_edge)
+            current_node = best_edge[1]
+        return path
+    
     def get_middle_node(self) -> Point:
         h_step = (self.screen_size[0] - self.padding) / (self.width-1)
         v_step = (self.screen_size[1] - self.padding) / (self.height-1)
@@ -58,20 +69,6 @@ class MovementGraph():
         middle_x = borders + int((math.floor(self.width/2) * h_step))
         middle_y = borders + int((math.floor(self.height/2) * v_step))
         return (middle_x, middle_y)
-    
-    def find_highest_value_path(self):
-        s = self.get_middle_node()
-        assert(self.G.in_degree(s) == 0)
-        
-        dist = dict.fromkeys(self.G.nodes, -float('inf'))
-        dist[s] = 0
-        topo_order = nx.topological_sort(self.G)
-
-        for n in topo_order:
-            for s in self.G.successors(n):
-                if dist[s] < dist[n] + self.G.edges[n,s]['weight']:
-                    dist[s] = dist[n] + self.G.edges[n,s]['weight']
-        return dist
     
     def draw_to_frame(self, frame):
         drawer = AnnotationDrawer()
@@ -83,6 +80,10 @@ class MovementGraph():
             edge_middle = middle_point(point_a, point_b)
             edge_middle = point_convert_to_int(edge_middle)
             drawer.draw_text_with_background(frame, f"{weight:.2f}", edge_middle)
+            
+    def draw_solution_to_frame(self, frame, solution):
+        for point_a, point_b, _ in solution:
+            cv2.line(frame, point_a, point_b, (0, 0, 255), 2)
     
     def draw_network_x(self, evaluator: PositionEvaluator):
         pos= self.__build_network_x_pos()

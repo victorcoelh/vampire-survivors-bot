@@ -2,7 +2,7 @@ import cv2
 
 from bot.computer_vision.object_detection import ObjectDetector
 from bot.game_ai.graph import MovementGraph
-from bot.game_ai.vampire_bot import PositionEvaluator
+from bot.game_ai.position_evaluator import PositionEvaluator
 
 
 def main():
@@ -14,9 +14,9 @@ def main():
     evaluator = PositionEvaluator(detections, class_names, 1)
     
     G = MovementGraph((960, 540), evaluator)
+    solution = G.calculate_best_path()
     G.draw_to_frame(frame)
-    G.draw_network_x(evaluator)
-    print(G.find_highest_value_path())
+    G.draw_solution_to_frame(frame, solution)
     
     cv2.imshow("Image", frame)
     cv2.waitKey()
