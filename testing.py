@@ -14,7 +14,7 @@ def main():
     evaluator = PositionEvaluator(detections, class_names, 1)
     
     G = MovementGraph((960, 540), evaluator)
-    solution = G.calculate_best_path()
+    solution = G.calculate_best_path(6)
     G.draw_to_frame(frame)
     G.draw_solution_to_frame(frame, solution)
     

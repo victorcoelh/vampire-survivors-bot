@@ -27,6 +27,9 @@ class PositionEvaluator():
         return np.clip(value, 0, 1)
     
     def __gain(self, position: Point):
+        if len(self.runes) == 0:
+            return 0
+        
         runes_collected = [1 - min(0.01*distance_to_point(position, rune), 1)
                            for rune in self.runes]
         
@@ -34,6 +37,9 @@ class PositionEvaluator():
 
     #TODO: experiment more with gain and risk functions
     def __risk(self, position: Point):
+        if len(self.monsters) == 0:
+            return 0
+        
         closest = np.min([distance_to_point(position, monster)
                           for monster in self.monsters])
         if closest == 0:
