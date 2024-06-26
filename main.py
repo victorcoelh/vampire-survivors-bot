@@ -8,7 +8,7 @@ from bot.computer_vision.annotations import AnnotationDrawer
 from bot.computer_vision.object_detection import ObjectDetector, Detection
 from bot.computer_vision.screenshot import screenshot
 
-from bot.game_ai.path_follower import PathManager, edge_list_to_direction_list
+from bot.game_ai.path_manager import PathManager, edge_list_to_direction_list
 from bot.game_ai.position_evaluator import PositionEvaluator
 from bot.game_ai.graph import MovementGraph
 

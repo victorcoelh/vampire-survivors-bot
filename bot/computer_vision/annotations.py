@@ -1,6 +1,5 @@
-import cv2
-
 from typing import Tuple
+import cv2
 
 
 class AnnotationDrawer:
