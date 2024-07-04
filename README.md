@@ -1,6 +1,6 @@
 # Vampire Survivors Bot
 
-![Showcase:](./assets/images/level_up_2.png "Bot Showcase")
+![Showcase:](./assets/gif_bot.gif "Bot Showcase")
 
 A bot that automatically plays the game Vampire Survivors. Uses the YOLOv8 model to identify
 enemies and other items of interest.
