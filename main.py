@@ -11,36 +11,12 @@ from bot.computer_vision.screenshot import screenshot
 from bot.game_ai.path_manager import PathManager, edge_list_to_direction_list
 from bot.game_ai.position_evaluator import PositionEvaluator
 from bot.game_ai.graph import MovementGraph
+from bot.game_ai.graph_drawer import GraphDrawer
 
 
 KEY_ESC = 27
 KEY_Q = 113
-
-
-def draw_debug_boxes(frame, drawer: AnnotationDrawer,
-                     detections: List[Detection], class_names: List[str]):   
-    for detection in detections:
-        x1, y1, x2, y2 = detection.position
-        label = class_names[detection.label]
-        debug_info = f"{label}: {detection.confidence:.2f}"
-        color = (0, 0, 255) if label == "monster" else (255, 0, 0) # BGR
-        
-        drawer.draw_rectangle(frame, color, (x1, y1), (x2, y2))
-        drawer.draw_text_with_background(frame, debug_info, (x1, y1))
-
-
-def get_frame_from_game(bounding_box: Tuple[int, int, int, int]):
-    frame = screenshot(bounding_box)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
-    frame = cv2.resize(frame, (960, 608))
-    return frame
-
-
-def check_and_update_box_position(key_press, game_area):
-    if key_press == KEY_Q:
-        x, y = pyautogui.position()
-        game_area["top"] = y
-        game_area["left"] = x
+IMAGE_SIZE = (960, 608)
 
 
 def main():
@@ -61,18 +37,19 @@ def main():
             frame = get_frame_from_game(game_area)
             
             detections, class_names = inference_model.get_detections(frame, 0.6)
-            draw_debug_boxes(frame, drawer, detections, class_names)
-            
             evaluator = PositionEvaluator(detections, class_names, 1)
-            G = MovementGraph((960, 540), evaluator)
-            solution = G.calculate_best_path(3)
-            G.draw_solution_to_frame(frame, solution)
+            graph = MovementGraph(IMAGE_SIZE, evaluator)
+            solution = graph.calculate_best_path(3)
             
             directions = edge_list_to_direction_list(solution)
             bot.add_to_pathing_queue(directions)
             
+            graph_drawer = GraphDrawer(graph.G)
+            draw_debug_boxes(frame, drawer, detections, class_names)
+            graph_drawer.draw_solution_to_frame(frame, solution)
+            
             cv2.imshow("Model Vision", frame)
-            check_and_update_box_position(key_press, game_area)
+            check_and_update_view_position(key_press, game_area)
         except Exception:
             stop_event.set()
             raise Exception
@@ -80,6 +57,37 @@ def main():
     stop_event.set()
     cv2.destroyAllWindows()
     return 0
+
+
+def draw_debug_boxes(frame, drawer: AnnotationDrawer,
+                     detections: List[Detection], class_names: List[str]):
+    """Draws the red and blue boxes depending on the type of entity detected."""
+    for detection in detections:
+        x1, y1, x2, y2 = detection.position
+        label = class_names[detection.label]
+        debug_info = f"{label}: {detection.confidence:.2f}"
+        color = (0, 0, 255) if label == "monster" else (255, 0, 0) # BGR
+        
+        drawer.draw_rectangle(frame, color, (x1, y1), (x2, y2))
+        drawer.draw_text_with_background(frame, debug_info, (x1, y1))
+
+
+def get_frame_from_game(bounding_box: Tuple[int, int, int, int]):
+    frame = screenshot(bounding_box)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+    frame = cv2.resize(frame, IMAGE_SIZE)
+    return frame
+
+
+def check_and_update_view_position(key_press, game_area):
+    """Updates the position at which screenshots will be captured from when the
+    letter Q is pressed.
+    """
+    if key_press == KEY_Q:
+        x, y = pyautogui.position()
+        game_area["top"] = y
+        game_area["left"] = x
+
 
 if __name__ == "__main__":
     main()
