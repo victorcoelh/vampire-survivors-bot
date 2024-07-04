@@ -1,4 +1,10 @@
 matplotlib
 numpy
+pandas
+scipy
 opencv-contrib-python
 ultralytics
+networkx
+mss
+PyAutoGUI
+pynput

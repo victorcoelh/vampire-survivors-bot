@@ -13,9 +13,9 @@ class PathManager:
         self.input = Controller()
         self.move_time = pixels_moved / player_speed
     
-    def follow_pathing_queue(self, stop_event: threading.Event):
+    def follow_pathing_queue(self, stop_event: threading.Event, pause_event: threading.Event):
         while not stop_event.is_set():
-            if self.__path_queue.qsize() == 0:
+            if self.__path_queue.qsize() == 0 or pause_event.is_set():
                 time.sleep(self.move_time)
                 continue
             

@@ -16,6 +16,7 @@ from bot.game_ai.graph_drawer import GraphDrawer
 
 KEY_ESC = 27
 KEY_Q = 113
+KEY_P = 112
 IMAGE_SIZE = (960, 608)
 
 
@@ -29,7 +30,8 @@ def main():
     game_area = {"top": 0, "left": 0, "width": game_dimensions[0], "height": game_dimensions[1]}
 
     stop_event = threading.Event()
-    bot_thread = threading.Thread(target=bot.follow_pathing_queue, args=[stop_event])
+    pause_event = threading.Event()
+    bot_thread = threading.Thread(target=bot.follow_pathing_queue, args=[stop_event, pause_event])
     bot_thread.start()
     
     while (key_press := cv2.waitKey(1)) != KEY_ESC:
@@ -50,6 +52,7 @@ def main():
             
             cv2.imshow("Model Vision", frame)
             check_and_update_view_position(key_press, game_area)
+            handle_pause(key_press, pause_event)
         except Exception:
             stop_event.set()
             raise Exception
@@ -87,6 +90,17 @@ def check_and_update_view_position(key_press, game_area):
         x, y = pyautogui.position()
         game_area["top"] = y
         game_area["left"] = x
+        
+
+def handle_pause(key_press, pause: threading.Event):
+    """Updates the position at which screenshots will be captured from when the
+    letter Q is pressed.
+    """    
+    if key_press == KEY_P:       
+        if pause.is_set():
+            pause.clear()
+        else:
+            pause.set()
 
 
 if __name__ == "__main__":
